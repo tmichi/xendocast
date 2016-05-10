@@ -1,0 +1,6 @@
+ADD_EXECUTABLE(xendocast xendocast_main.cpp ExtractEndocastCommand.hpp ExtractEndocastCommand.cpp )
+INSTALL(TARGETS xendocast
+	RUNTIME
+	DESTINATION bin
+	PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
