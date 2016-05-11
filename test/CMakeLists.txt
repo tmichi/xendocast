@@ -1,1 +1,1 @@
-ADD_EXECUTABLE(visws visws.cpp)
+#ADD_EXECUTABLE(visws visws.cpp)

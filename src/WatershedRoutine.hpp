@@ -6,6 +6,8 @@
 #include <mi/Clamp.hpp>
 #include <mi/VolumeDataUtility.hpp>
 #include <mi/VolumeDataCreator.hpp>
+#include <mi/PriorityQueue.hpp>
+#include <mi/Neighbor.hpp>
 #include <iostream>
 #include <memory>
 
@@ -17,8 +19,10 @@ private:
 	float _scale;
 public:
 	WatershedRoutine ( const mi::VolumeData<char>& binaryData, mi::VolumeData<char>& labelData ) : 
-		mi::Routine ("Watershed"), _binaryData(binaryData), _labelData(labelData), _holeSize(-1), _scale(0.5) {
+		mi::Routine ("Watershed"), _binaryData(binaryData), _labelData(labelData), _hole_size(-1), _scale(0.5) {
 		// check validity here
+		labelData.init ( const_cast<mi::VolumeData<char>&>(binaryData).getInfo());
+		
 		return;
 	}
 	
@@ -28,7 +32,7 @@ public:
 	}
 
 	WatershedRoutine& setScale( const float scale ) {
-		this->_scale = mi::clamp(scale, 1.0e-4, 1);
+		this->_scale = mi::clamp<float>(scale, 1.0e-4, 1);
 		return *this;
 	}
 
@@ -39,16 +43,15 @@ public:
 		mi::VolumeDataUtility::compute_distance_field(this->_binaryData, distData);
 		
 		// init label
-		mi::VolumeData<char> labelData;
 		if ( this->is_automatic() ) {
-			this->init_label_automatic(distData, labelData);
+			this->init_label_automatic(distData, this->_labelData);
 		}
 		else {
-			this->init_label_manual(distData, labelData, this->_hole_size);
+			this->init_label_manual(distData, this->_labelData, this->_hole_size);
 		}
 		
 		// Watershed 
-		this->watershed ( distData, labelData) ; 
+		this->watershed ( distData, this->_labelData) ; 
 
 		return true;
 	}
@@ -58,10 +61,10 @@ private:
 		return this->_hole_size < 0 ;
 	}
 
-	void init_label_automatic ( const mi::VolumeData<float>& distdata, mi::volumeData<char>& initData ) {
+	bool init_label_automatic ( const mi::VolumeData<float>& distData, mi::VolumeData<char>& initData ) {
                 std::cerr<<"automatic mode."<<std::endl;
                 const float& scale = this->_scale;
-		mi::VolumeInfo& info = distData.getInfo();
+		mi::VolumeInfo& info = const_cast<mi::VolumeData<float>&>(distData).getInfo();
 		mi::Range range( info.getMin(), info.getMax() );
 		
 		mi::VolumeDataCreator<char> creator( initData ) ;
@@ -82,7 +85,7 @@ private:
                 float maxDist = 0;
                 for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
                         const mi::Point3i& p = *iter;
-                        if ( labelData.get( p ) == 1 ) continue; // skip other voxels.
+                        if ( initData.get( p ) == 1 ) continue; // skip other voxels.
                         const float dist = distData.get( p );
                         if ( maxDist < dist ) {
                                 maxDist = dist;
@@ -92,17 +95,17 @@ private:
                 creator.setValue( 2 );
                 creator.fillSphere( maxp, maxDist * scale ); // 0.5
 
-		return;
+		return true;
 	}
 
-	void init_label_manual ( const mi::VolumeData<float>& distdata, mi::volumeData<char>& initData , const float holeSize ) {
-		mi::VolumeInfo& info = distData.getInfo();
+	bool init_label_manual ( const mi::VolumeData<float>& distData, mi::VolumeData<char>& initData , const float holeSize ) {
+		mi::VolumeInfo& info = const_cast<mi::VolumeData<float>& >(distData).getInfo();
 		mi::Range range( info.getMin(), info.getMax() );
 		mi::VolumeData<char> binaryData( info );
 		initData.init(info);
 		for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
                         const mi::Point3i p = *iter;
-                        const char value = ( distData.get( p ) < holesize ) ? 0 : 1; //
+                        const char value = ( distData.get( p ) < holeSize ) ? 0 : 1; //
                         binaryData.set( p,value );
                 }
                 
@@ -113,26 +116,27 @@ private:
 		// 1 : other voxel 
 	        // 2 : endcranial voxels
 		// 3~ : others.
-                int numLabel = 0;
-                if( !mi::VolumeDataUtility::label_rle( binaryData, initData, 26, true, &numLabel ) ) return false;
-		return;
+                const int numLabel =mi::VolumeDataUtility::label_rle( binaryData, initData, 26, true);
+		
+                if( numLabel < 2 ) return false;
+		return true;
 	}
 
-	void watershed ( mi::VolumeData<float>& distData, mi::VolumeData<char>& labelData) {
-		const mi::VolumeInfo& info = const_cast<mi::VolumeData<T>&>( labelData ).getInfo();
+	bool watershed ( mi::VolumeData<float>& distData, mi::VolumeData<char>& labelData) {
+		const mi::VolumeInfo& info = const_cast<mi::VolumeData<char>&>( labelData ).getInfo();
 		mi::Range range( info.getMin(), info.getMax() );
 
-		mi::PriorityQueue <Point3i> pq;
+		mi::PriorityQueue <mi::Point3i> pq;
 		
 		for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
 			const mi::Point3i& p = *iter;
 			if ( labelData.get( p ) > 0 ) {
-				pq.push( p, -this->_weightData.get( p ) ) ;
+				pq.push( p, -distData.get( p ) ) ;
 			}
 		}
 		
 		while( !pq.empty() ) {
-			const Point3i p = pq.getTopIndex();
+			const mi::Point3i p = pq.getTopIndex();
 			pq.pop();
 
 			const int labelId = labelData.get( p ); // Label ID to be propagated.
@@ -142,9 +146,9 @@ private:
 				if ( !info.isValid( np ) ) continue;
 				if ( labelData.get( np ) != 0 ) continue; // skip bg
 
-				if( this->_weightData.get( np ) > 0 ) { // propagate only to bg voxels.
+				if( distData.get( np ) > 0 ) { // propagate only to bg voxels.
 					labelData.set( np, labelId );
-					pq.push( np, -this->_weightData.get( np ) );
+					pq.push( np, -distData.get( np ) );
 				}
 			}
 		}
