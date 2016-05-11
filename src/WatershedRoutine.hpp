@@ -19,7 +19,7 @@ private:
 	float _scale;
 public:
 	WatershedRoutine ( const mi::VolumeData<char>& binaryData, mi::VolumeData<char>& labelData ) : 
-		mi::Routine ("Watershed"), _binaryData(binaryData), _labelData(labelData), _hole_size(-1), _scale(0.5) {
+		mi::Routine ("watershed"), _binaryData(binaryData), _labelData(labelData), _hole_size(-1), _scale(0.5) {
 		// check validity here
 		labelData.init ( const_cast<mi::VolumeData<char>&>(binaryData).getInfo());
 		
@@ -30,21 +30,22 @@ public:
 		this->_hole_size = holeSize;
 		return *this;
 	}
-
+	
 	WatershedRoutine& setScale( const float scale ) {
 		this->_scale = mi::clamp<float>(scale, 1.0e-4, 1);
 		return *this;
 	}
-
 	
-
+	
+	
 	bool run_main_routine ( void ) {
 		mi::VolumeData<float> distData;
 		mi::VolumeDataUtility::compute_distance_field(this->_binaryData, distData);
-		
+		mi::VolumeDataUtility::debug_save(this->create_temp_file_name ("d.raw"), distData);	
 		// init label
 		if ( this->is_automatic() ) {
 			this->init_label_automatic(distData, this->_labelData);
+			mi::VolumeDataUtility::debug_save(this->create_temp_file_name ("l0.raw"), this->_labelData);	
 		}
 		else {
 			this->init_label_manual(distData, this->_labelData, this->_hole_size);
@@ -52,7 +53,7 @@ public:
 		
 		// Watershed 
 		this->watershed ( distData, this->_labelData) ; 
-
+		mi::VolumeDataUtility::debug_save(this->create_temp_file_name ("l1.raw"), this->_labelData);	
 		return true;
 	}
 
