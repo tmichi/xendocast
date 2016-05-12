@@ -76,8 +76,9 @@ private:
                         const mi::Point3i& p = *iter;
                         //if ( info.isCorner( p ) && labelData.get( p ) == 0 ) { // speed up
                         if ( info.isCorner( p ) ) {
-                                const float dist = distData.get( p );
-                                if ( dist > 0 ) creator.fillSphere( p, dist * scale );
+                                //const float dist = distData.get( p );
+                                //if ( dist > 0 ) creator.fillSphere( p, dist * scale );
+				creator.fillPoint(p);
                         }
                 }
 		
