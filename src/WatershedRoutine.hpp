@@ -19,7 +19,7 @@ private:
 	float _scale;
 public:
 	WatershedRoutine ( const mi::VolumeData<char>& binaryData, mi::VolumeData<char>& labelData ) : 
-		mi::Routine ("watershed"), _binaryData(binaryData), _labelData(labelData), _hole_size(-1), _scale(0.5) {
+		mi::Routine ("watershed"), _binaryData(binaryData), _labelData(labelData), _hole_size(-1), _scale(0.9) {
 		// check validity here
 		labelData.init ( const_cast<mi::VolumeData<char>&>(binaryData).getInfo());
 		
@@ -72,13 +72,12 @@ private:
 
 		// Corner voxels
                 creator.setValue( 1 ); // other voxel
-                for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
-                        const mi::Point3i& p = *iter;
-                        //if ( info.isCorner( p ) && labelData.get( p ) == 0 ) { // speed up
-                        if ( info.isCorner( p ) ) {
-                                //const float dist = distData.get( p );
-                                //if ( dist > 0 ) creator.fillSphere( p, dist * scale );
-				creator.fillPoint(p);
+		int count = 0;
+		for( auto&& p : info ) {
+                        if ( info.isCorner( p ) && initData.get( p ) == 0 ) { // speed up
+                                const float dist = distData.get( p );
+                                if ( dist > 0 ) creator.fillSphere( p, dist * scale );
+				std::cerr<<p.transpose()<<" "<<count++<<std::endl;
                         }
                 }
 		

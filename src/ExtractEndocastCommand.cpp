@@ -47,10 +47,6 @@ ExtractEndocastCommand<T>::init ( const mi::Argument& arg )
         if ( this->isDebugModeOn() ) {
                 mi::VolumeDataUtility::setDebugModeOn();
         }
-// @todo add
-//	mi::SystemInfo::print( mi::Logger::getStream() );
-//	this->getAttributeSet().print( mi::Logger::getStream() );
-
         mi::VolumeDataUtility::numThreads() =  this->_num_threads;
         this->_ctData.init( mi::VolumeInfo( this->_size, this->_pitch, this->_origin ) );
         if ( ! mi::VolumeDataUtility::open( this->_ct_file, this->_ctData, this->_header_size ) ) return false;
@@ -61,13 +57,15 @@ template<typename T>
 bool
 ExtractEndocastCommand<T>::run  ( void )
 {
-        const mi::VolumeInfo& info = const_cast<mi::VolumeData<T>&>( this->_ctData ).getInfo();
-        const std::string fileHeader = mi::FileNameConverter( this->_ct_file ).removeExtension();	
-        mi::VolumeData<char> binaryData( info );
-	if ( !mi::Routine::run( BinarizationRoutine<T>( this->_ctData, binaryData ).setThreshold(this->_isovalue).setTempFileNameHeader(fileHeader).getInstance())) return false;
-
+	const mi::VolumeData<T>& ctData = this->_ctData;
+        const mi::VolumeInfo& info = const_cast< mi::VolumeData<T>& >(ctData).getInfo();
+	const std::string fileHeader = mi::FileNameConverter( this->_ct_file ).removeExtension();	
+	
+	mi::VolumeData<char> binaryData( info );
+	if ( !mi::Routine::run(BinarizationRoutine<T>( xtData, binaryData ).setThreshold(this->_isovalue).setTempFileNameHeader(fileHeader).getInstance())) return false;
+	
         mi::VolumeData<char>  labelData( info );
-	if ( mi::Routine::run(	WatershedRoutine( binaryData,labelData).setTempFileNameHeader(fileHeader).getInstance() ) ) return false;
+	if ( !mi::Routine::run(WatershedRoutine( binaryData,labelData).setTempFileNameHeader(fileHeader).getInstance() ) ) return false;
         binaryData.deallocate();
 /*	
 	if ( mi::Routine::run( MaskingRoutine( labelData,this->_ctData).getInstance()) ) return false;
