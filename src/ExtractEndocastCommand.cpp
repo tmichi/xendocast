@@ -7,7 +7,8 @@
 #include <mi/FileNameConverter.hpp>
 #include <mi/SystemInfo.hpp>
 
-
+#include <mi/VolumeDataPolygonizer.hpp>
+#include <mi/TriMeshExporterObj.hpp>
 
 template<typename T>
 ExtractEndocastCommand<T>::ExtractEndocastCommand ( void ) : mi::CommandTemplate( "xendocast" )
@@ -67,6 +68,19 @@ ExtractEndocastCommand<T>::run  ( void )
         mi::VolumeData<char>  labelData( info );
 	if ( !mi::Routine::run(WatershedRoutine( binaryData,labelData).setTempFileNameHeader(fileHeader).getInstance() ) ) return false;
         binaryData.deallocate();
+
+	// endocast : 2
+	mi::Range range( info );
+	for( auto&& p : range) {
+		char v = 0;
+		if ( labelData.get( p ) == 2 ) v = 1;
+		labelData.set(p, v);
+	}
+
+	mi::VolumeDataPolygonizer<T> polygonizer( ctData, labelData);
+	polygonizer.polygonize(this->_isovalue, this->_endocast_polygon);
+	this->_endocast_polygon.stitch(1.0e-10);
+
 /*	
 	if ( mi::Routine::run( MaskingRoutine( labelData,this->_ctData).getInstance()) ) return false;
 */
@@ -77,8 +91,7 @@ template<typename T>
 bool
 ExtractEndocastCommand<T> ::term ( void )
 {
-	return true;
-//        return mi::MeshUtility::save( this->_endocast_polygon, this->_output_file );
+	return mi::TriMeshExporterObj(this->_endocast_polygon).write( this->_output_file);
 }
 
 template class ExtractEndocastCommand<char>;

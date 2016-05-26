@@ -72,7 +72,7 @@ private:
 
 		// Corner voxels
                 creator.setValue( 1 ); // other voxel
-		int count = 0;
+//		int count = 0;
 		for( auto&& p : range ) {
                         if ( info.isCorner( p ) && initData.get( p ) == 0 ) { // speed up
                                 const float dist = distData.get( p );
@@ -151,6 +151,7 @@ private:
 				}
 			}
 		}
+
  		return true;
 	}
 };

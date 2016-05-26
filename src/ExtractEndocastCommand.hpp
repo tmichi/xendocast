@@ -2,7 +2,7 @@
 #define EXTRACT_ENDOCAST_COMMAND_HPP 1
 #include <mi/CommandTemplate.hpp>
 #include <mi/VolumeData.hpp>
-
+#include <mi/TriMesh.hpp>
 template <typename T>
 class ExtractEndocastCommand : public mi::CommandTemplate
 {
@@ -21,6 +21,8 @@ private:
 
         mi::VolumeData<T>    _ctData;
         mi::VolumeData<char> _binaryData;
+	mi::TriMesh _endocast_polygon;
+
 
         bool _auto;
         bool _fillHole;
