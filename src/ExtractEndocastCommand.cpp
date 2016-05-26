@@ -62,7 +62,7 @@ ExtractEndocastCommand<T>::run  ( void )
 	const std::string fileHeader = mi::FileNameConverter( this->_ct_file ).removeExtension();	
 	
 	mi::VolumeData<char> binaryData( info );
-	if ( !mi::Routine::run(BinarizationRoutine<T>( xtData, binaryData ).setThreshold(this->_isovalue).setTempFileNameHeader(fileHeader).getInstance())) return false;
+	if ( !mi::Routine::run(BinarizationRoutine<T>( ctData, binaryData ).setThreshold(this->_isovalue).setTempFileNameHeader(fileHeader).getInstance())) return false;
 	
         mi::VolumeData<char>  labelData( info );
 	if ( !mi::Routine::run(WatershedRoutine( binaryData,labelData).setTempFileNameHeader(fileHeader).getInstance() ) ) return false;

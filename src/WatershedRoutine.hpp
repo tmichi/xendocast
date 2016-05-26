@@ -73,11 +73,11 @@ private:
 		// Corner voxels
                 creator.setValue( 1 ); // other voxel
 		int count = 0;
-		for( auto&& p : info ) {
+		for( auto&& p : range ) {
                         if ( info.isCorner( p ) && initData.get( p ) == 0 ) { // speed up
                                 const float dist = distData.get( p );
                                 if ( dist > 0 ) creator.fillSphere( p, dist * scale );
-				std::cerr<<p.transpose()<<" "<<count++<<std::endl;
+				//std::cerr<<p.transpose()<<" "<<count++<<std::endl;
                         }
                 }
 		
@@ -101,11 +101,11 @@ private:
 
 	bool init_label_manual ( const mi::VolumeData<float>& distData, mi::VolumeData<char>& initData , const float holeSize ) {
 		mi::VolumeInfo& info = const_cast<mi::VolumeData<float>& >(distData).getInfo();
-		mi::Range range( info.getMin(), info.getMax() );
+
 		mi::VolumeData<char> binaryData( info );
-		initData.init(info);
-		for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
-                        const mi::Point3i p = *iter;
+		initData.init(info);		
+		mi::Range range( info );
+		for( auto&& p : range) {
                         const char value = ( distData.get( p ) < holeSize ) ? 0 : 1; //
                         binaryData.set( p,value );
                 }
@@ -125,12 +125,10 @@ private:
 
 	bool watershed ( mi::VolumeData<float>& distData, mi::VolumeData<char>& labelData) {
 		const mi::VolumeInfo& info = const_cast<mi::VolumeData<char>&>( labelData ).getInfo();
-		mi::Range range( info.getMin(), info.getMax() );
-
 		mi::PriorityQueue <mi::Point3i> pq;
-		
-		for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
-			const mi::Point3i& p = *iter;
+
+		mi::Range range( info );
+		for( auto&& p : range) {
 			if ( labelData.get( p ) > 0 ) {
 				pq.push( p, -distData.get( p ) ) ;
 			}
