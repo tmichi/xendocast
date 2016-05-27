@@ -3,6 +3,7 @@
 
 #include "BinarizationRoutine.hpp"
 #include "WatershedRoutine.hpp"
+#include "MaskingRoutine.hpp"
 
 #include <mi/FileNameConverter.hpp>
 #include <mi/SystemInfo.hpp>
@@ -69,21 +70,23 @@ ExtractEndocastCommand<T>::run  ( void )
 	if ( !mi::Routine::run(WatershedRoutine( binaryData,labelData).setTempFileNameHeader(fileHeader).getInstance() ) ) return false;
         binaryData.deallocate();
 
+	if (! mi::Routine::run( MaskingRoutine<T>( labelData, this->_ctData).setCtValue(this->_isovalue).getInstance()) ) return false;
 	// endocast : 2
-	mi::Range range( info );
+/*	mi::Range range( info );
 	for( auto&& p : range) {
 		char v = 0;
 		if ( labelData.get( p ) == 2 ) v = 1;
 		labelData.set(p, v);
 	}
-
+*/
+	labelData.deallocate();
 	mi::VolumeDataPolygonizer<T> polygonizer( ctData, labelData);
 	polygonizer.polygonize(this->_isovalue, this->_endocast_polygon);
 	this->_endocast_polygon.stitch(1.0e-10);
 
-/*	
-	if ( mi::Routine::run( MaskingRoutine( labelData,this->_ctData).getInstance()) ) return false;
-*/
+
+
+
         return true;
 }
 

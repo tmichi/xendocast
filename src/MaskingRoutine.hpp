@@ -16,10 +16,12 @@ private:
 	mi::VolumeData<T>& _ctData;
 	float _ctValue;
 public:
-	MaskingRoutine ( const mi::VolumeData<char>& maskData, mi::VolumeData<T>& ctData , const float ctValue) : 
-		mi::Routine ("masking"), _maskData(maskData), _ctData(ctData), _ctValue(cvValue) {
+	MaskingRoutine ( const mi::VolumeData<char>& maskData, mi::VolumeData<T>& ctData ) : 
+		mi::Routine ("masking"), _maskData(maskData), _ctData(ctData), _ctValue(0) {
 		// check validity here
-		if ( maskData.getSize() != ctData.getSize() ) {
+
+		if ( const_cast<mi::VolumeData<char>& >(maskData).getSize() != ctData.getSize() ) {
+			std::cerr<<"different size"<<std::endl;
 			this->set_failed();
 		}
 		return;
@@ -31,13 +33,11 @@ public:
 	}
 
 	bool run_main_routine ( void ) {
-		const mi::VolumeInfo& info = const_cast<mi::VolumeData<T>&>( labelData ).getInfo();
-		mi::Range range( info.getMin(), info.getMax() );
-		
-		//
-		for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
-			const mi::Point3i& p = *iter;
-			if ( maskData.get( p ) == 2 ) {
+		const mi::VolumeData<char>& maskData = this->_maskData;
+		const mi::VolumeInfo& info = const_cast<mi::VolumeData<char>&>( maskData ).getInfo();
+		mi::Range range( info );
+		for( auto&&p : range ) {
+			if ( maskData.get( p ) == 0 && this->_ctData.get(p) < this->_ctValue) {
 				this->_ctData.set(p, this->_ctValue);
 			}
 		}
