@@ -37,8 +37,7 @@ public:
 		for( auto&&p : range ) {
 			// CT値が閾値以下 && マスクが0 
 			const char mask = maskData.get(p);
-			if ( mask == 0 ) continue;
-			if ( mask == 2 ) continue;
+			if ( mask == 2 ) continue; // skip endocast labels
 			if(  this->_ctData.get(p) < this->_ctValue) {
 				this->_ctData.set(p, this->_ctValue);
 			}

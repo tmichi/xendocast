@@ -72,12 +72,10 @@ private:
 
 		// Corner voxels
                 creator.setValue( 1 ); // other voxel
-//		int count = 0;
 		for( auto&& p : range ) {
                         if ( info.isCorner( p ) && initData.get( p ) == 0 ) { // speed up
                                 const float dist = distData.get( p );
                                 if ( dist > 0 ) creator.fillSphere( p, dist * scale );
-				//std::cerr<<p.transpose()<<" "<<count++<<std::endl;
                         }
                 }
 		
@@ -134,24 +132,62 @@ private:
 			}
 		}
 		
+		float stop  = 0;
 		while( !pq.empty() ) {
+			if ( -pq.getTopCost() < stop) break; // 追加分
 			const mi::Point3i p = pq.getTopIndex();
 			pq.pop();
-
+			
 			const int labelId = labelData.get( p ); // Label ID to be propagated.
-
 			for( mi::Neighbor::iterator diter = mi::Neighbor::begin() ; diter != mi::Neighbor::end( 6 ) ; ++diter ) {
 				const mi::Point3i np = *diter + p;
 				if ( !info.isValid( np ) ) continue;
 				if ( labelData.get( np ) != 0 ) continue; // skip bg
-
+				
 				if( distData.get( np ) > 0 ) { // propagate only to bg voxels.
 					labelData.set( np, labelId );
 					pq.push( np, -distData.get( np ) );
 				}
 			}
 		}
+		
+		/*
+		mi::VolumeData<char> binData( info );
+		for ( auto&& p : range) {
+			if ( labelData.get(p) == 1 || labelData.get(p) == 2 ) {
+				binData.set(p, 1);
+			}
+		}
+		
+		distData.init(info);
+		mi::VolumeDataUtility::compute_distance_field(binData, distData);		
 
+		
+		for( auto&& p : range) {
+			if ( binData.get(p) == 1 ) {
+				pq.push( p, distData.get( p ) ) ;
+			}
+		}
+		
+		while( !pq.empty() ) {
+			const mi::Point3i p = pq.getTopIndex();
+			pq.pop();
+
+			const int labelId = labelData.get( p ); // Label ID to be propagated.
+			for( mi::Neighbor::iterator diter = mi::Neighbor::begin() ; diter != mi::Neighbor::end( 6 ) ; ++diter ) {
+				const mi::Point3i np = *diter + p;
+				if ( !info.isValid( np ) ) continue;
+
+				if ( labelData.get( np ) != 0 ) continue; // skip already labeled
+				if ( this->_binaryData.get(p) == 0 ) continue;  // skip skulls.
+
+				if( distData.get( np ) <= stop ) { // propagate only to bg voxels.
+					labelData.set( np, labelId );
+					pq.push( np, distData.get( np ) );
+				}
+			}
+			}*/
+		
  		return true;
 	}
 };
