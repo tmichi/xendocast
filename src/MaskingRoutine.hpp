@@ -18,8 +18,6 @@ private:
 public:
 	MaskingRoutine ( const mi::VolumeData<char>& maskData, mi::VolumeData<T>& ctData ) : 
 		mi::Routine ("masking"), _maskData(maskData), _ctData(ctData), _ctValue(0) {
-		// check validity here
-
 		if ( const_cast<mi::VolumeData<char>& >(maskData).getSize() != ctData.getSize() ) {
 			std::cerr<<"different size"<<std::endl;
 			this->set_failed();
@@ -37,7 +35,11 @@ public:
 		const mi::VolumeInfo& info = const_cast<mi::VolumeData<char>&>( maskData ).getInfo();
 		mi::Range range( info );
 		for( auto&&p : range ) {
-			if ( maskData.get( p ) == 0 && this->_ctData.get(p) < this->_ctValue) {
+			// CT値が閾値以下 && マスクが0 
+			const char mask = maskData.get(p);
+			if ( mask == 0 ) continue;
+			if ( mask == 2 ) continue;
+			if(  this->_ctData.get(p) < this->_ctValue) {
 				this->_ctData.set(p, this->_ctValue);
 			}
 		}

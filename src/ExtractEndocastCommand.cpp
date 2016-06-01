@@ -69,8 +69,8 @@ ExtractEndocastCommand<T>::run  ( void )
         mi::VolumeData<char>  labelData( info );
 	if ( !mi::Routine::run(WatershedRoutine( binaryData,labelData).setTempFileNameHeader(fileHeader).getInstance() ) ) return false;
         binaryData.deallocate();
-
 	if (! mi::Routine::run( MaskingRoutine<T>( labelData, this->_ctData).setCtValue(this->_isovalue).getInstance()) ) return false;
+
 	// endocast : 2
 /*	mi::Range range( info );
 	for( auto&& p : range) {
