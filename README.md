@@ -16,6 +16,21 @@ In this project, we used following two programs.
 fillporosity is a program to manipulate CT values at void voxels to user-specified threshold. xendocast is a program for extracting endocast region from CT images. Please visit the following link to download software ( for Win 64bit).
 Note that the original program for filling porosity (Binarization step in the paper) is different from the fillporosity program provided above due to a licensing problem. However this provides almost equivalent features to the original program (but slow) .
 
+### Requirement 
+ - Eigen (http://eigen.tuxfamily.org)
+ - CMake ( Building codes) . 
+ 
+### How to build 
+On Mac
+```
+$ cmake ..
+$ make
+```
+On Windows 
+ - Install Eigen somewehre(Set path where Eigen exists)
+ - Run CMake to create Visual studio project files.  
+ - Build by Visual studio XXXX.
+ 
 ## Usage
 ### fillporosity
 
