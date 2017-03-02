@@ -20,7 +20,7 @@ Note that the original program for filling porosity (Binarization step in the pa
  - C++ compiler
  - Eigen (http://eigen.tuxfamily.org)
  - CMake ( Building codes) . 
- - [Microsoft Visual C++ 2015 Redistributable ](https://www.microsoft.com/en-us/download/details.aspx?id=53840) (for Windows user)
+ - [Microsoft Visual C++ 2015 Redistributable ](https://www.microsoft.com/en-us/download/details.aspx?id=53840) (if you use binary only)
  
 ### How to build 
 On Mac
