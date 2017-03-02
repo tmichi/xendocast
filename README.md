@@ -55,7 +55,7 @@ xendocast is a program to extract endocast polygon from  CT images. The argument
  - -o Output void file (wavefront OBJ file).The result can be visualized by opensource mesh editors ( e.g. MeshLab). 
  
 ## Example
- - Download "CT study of a cadaver head" dataset (16-bit TIFF files) from The Stanford volume data archive
+ - Download "CT study of a cadaver head" dataset (16-bit TIFF files) from The Stanford volume data archive (https://graphics.stanford.edu/data/voldata/)
  - Convert tiff files to 3D raw data by ImageJ (http://imagej.nih.gov). The size will be 256x256x99 (unsigned short /voxel).
  - Run fillporosity program.
 ```
@@ -66,6 +66,8 @@ fillporosity -ushort -size 256 256 99 -h 0 -iso 1300 -r 6 -ncp 3 -ncg 3 -thread 
 xendocast -ushort -thread 12 -fill -size 256 256 99 -pitch 1 1 2 -h 0 -iso 1300 -auto -i cthead-256x256x99f.raw -o cthead-256x256x99.obj
 ```
 - The result polygon (cthead-256x256x99.obj) is shown below.
+
+
 
 
 ## Citation
