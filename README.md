@@ -17,8 +17,10 @@ fillporosity is a program to manipulate CT values at void voxels to user-specifi
 Note that the original program for filling porosity (Binarization step in the paper) is different from the fillporosity program provided above due to a licensing problem. However this provides almost equivalent features to the original program (but slow) .
 
 ### Requirement 
+ - C++ compiler
  - Eigen (http://eigen.tuxfamily.org)
  - CMake ( Building codes) . 
+ - [Microsoft Visual C++ 2015 Redistributable ](https://www.microsoft.com/en-us/download/details.aspx?id=53840) (for Windows user)
  
 ### How to build 
 On Mac
