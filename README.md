@@ -1,12 +1,8 @@
-# xendocast
-
-Extracting endocranial surfaces from CT images
-
-## Introduction
+# Introduction
 
 This is open for providing a prototyping software and data for the paper "Automatic Extraction of Endocranial Surfaces from CT images of crania".
 
-## Software
+# Software
  - [Version 0.1](https://github.com/tmichi/xendocast/releases/tag/0.1)
  
 In this project, we used following two programs.
@@ -17,25 +13,25 @@ In this project, we used following two programs.
 fillporosity is a program to manipulate CT values at void voxels to user-specified threshold. xendocast is a program for extracting endocast region from CT images. Please visit the following link to download software ( for Win 64bit).
 Note that the original program for filling porosity (Binarization step in the paper) is different from the fillporosity program provided above due to a licensing problem. However this provides almost equivalent features to the original program (but slow) .
 
-### Requirement 
+## Requirement 
  - C++ compiler
  - Eigen (http://eigen.tuxfamily.org)
  - CMake ( Building codes) . 
  - [Microsoft Visual C++ 2015 Redistributable ](https://www.microsoft.com/en-us/download/details.aspx?id=53840) (if you use binary only)
  
-### How to build 
-On Mac
+## How to build 
+### Mac (or Unix-like system (not tested)) 
 ```
 $ cmake ..
 $ make
 ```
-On Windows 
+### Windows 
  - Install Eigen somewehre(Set path where Eigen exists)
  - Run CMake to create Visual studio project files.  
  - Build by Visual studio XXXX.
  
-## Usage
-### fillporosity
+# Usage
+## fillporosity
 
 ```
     fillporosity -short -size 512 512 299 -h 0 -iso 800 -r 9 -ncp 3 -ncg 3 -thread 12 -i kuma3008-512x512x299-0.468x0.468x0.5.raw -o kuma3008-512x512x299-0.468x0.468x0.5f.raw
@@ -54,7 +50,7 @@ fillporosity program replaces CT values at small void structure in the cranium m
  - -i Input RAW File (binary RAW file ) . 
  - -o Output RAW file
 
-### xendocast
+## xendocast
 
 ```
     xendocast -short -thread 12 -fill -size 512 512 360 -pitch 0.468 0.468 0.468 -h 0 -iso 910 -auto -i  mladec1f.raw -o  mladec1.obj
@@ -88,13 +84,14 @@ xendocast -ushort -thread 12 -fill -size 256 256 99 -pitch 1 1 2 -h 0 -iso 1300 
 ![Result](doc/result.png "Result")
 
 
-## Citation
+# Citation
 When you publish papers by using the software, we kindly ask you to cite the following paper.(* Formal citation will appear after publication).
 
 Takashi Michikawa, Hiromasa Suzuki, Masaki Moriguchi, Naomichi Ogihara, Osamu Kondo and Yasushi Kobayashi, "Automatic extraction of endocranial surfaces from CT images of crania".
-##License
+
+# License
 
 The code is distributed under MIT License.
 
-## Contact
+# Contact
 Takashi Michikawa < michikawa at acm.org >
