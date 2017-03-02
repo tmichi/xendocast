@@ -7,7 +7,7 @@ Extracting endocranial surfaces from CT images
 This is open for providing a prototyping software and data for the paper "Automatic Extraction of Endocranial Surfaces from CT images of crania".
 
 ## Software
-
+ - [Version 0.1](https://github.com/tmichi/xendocast/releases/tag/0.1)
 In this project, we used following two programs.
 
  - fillporosity : Porosity filling program
