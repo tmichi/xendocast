@@ -67,7 +67,7 @@ xendocast -ushort -thread 12 -fill -size 256 256 99 -pitch 1 1 2 -h 0 -iso 1300 
 ```
 - The result polygon (cthead-256x256x99.obj) is shown below.
 
-![Result](doc/result.png =320x "Result")
+![Result](doc/result.png "Result")
 
 
 ## Citation
