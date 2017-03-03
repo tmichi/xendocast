@@ -88,7 +88,7 @@ xendocast -ushort -thread 12 -fill -size 256 256 99 -pitch 1 1 2 -h 0 -iso 1300 
 # Citation
 When you publish papers by using the software, we kindly ask you to cite the following paper.(* Formal citation will appear after publication).
 
-Takashi Michikawa, Hiromasa Suzuki, Masaki Moriguchi, Naomichi Ogihara, Osamu Kondo and Yasushi Kobayashi, "Automatic extraction of endocranial surfaces from CT images of crania".
+ - Takashi Michikawa, Hiromasa Suzuki, Masaki Moriguchi, Naomichi Ogihara, Osamu Kondo and Yasushi Kobayashi, "Automatic extraction of endocranial surfaces from CT images of crania", _submitted for publication_.
 
 # License
 
