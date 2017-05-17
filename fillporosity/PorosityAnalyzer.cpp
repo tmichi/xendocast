@@ -2,7 +2,7 @@
 #include <mi/VolumeDataUtility.hpp>
 #include <mi/Neighbor.hpp>
 #include <mi/FileNameConverter.hpp>
-#include <mi/SystemInfo.hpp>
+//#include <mi/SystemInfo.hpp>
 #include "ConstrainedMorphology.hpp"
 PorosityAnalyzer::PorosityAnalyzer ( const mi::VolumeData<char>& data, const double radius, const int num_pruning, const int num_growing) 
 	: _data(data),  _radius(radius), _num_pruning(num_pruning), _num_growing ( num_growing)  {

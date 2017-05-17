@@ -4,7 +4,7 @@
 #include <mi/VolumeDataPolygonizer.hpp>
 #include <mi/Neighbor.hpp>
 #include <mi/FileNameConverter.hpp>
-#include <mi/SystemInfo.hpp>
+//#include <mi/SystemInfo.hpp>
 #include <mi/WatershedProcessor.hpp>
 #include "Binarizer.hpp"
 #include <mi/VolumeDataCreator.hpp>
@@ -24,7 +24,10 @@ ExtractEndocastCommand<T>::ExtractEndocastCommand ( void ) : mi::CommandTemplate
         attrSet.createNumericAttribute<int> ( "-h", this->_header_size, "header size" ).setDefaultValue( 0 ).setMin( 0 );
         attrSet.createTripleNumericAttribute<double>( "-pitch", pitch.x(), pitch.y(), pitch.z(), "pitch size" ).setMin ( 0.0001, 0.0001, 0.0001 ).setDefaultValue( 1,1,1 );
         attrSet.createTripleNumericAttribute<double>( "-origin", origin.x(), origin.y(), origin.z(), "origin point" ).setDefaultValue( 0, 0, 0 );
-        attrSet.createNumericAttribute<int> ( "-thread", this->_num_threads, "The number of threads" ).setDefaultValue( mi::SystemInfo::getNumCores() ).setMin( 1 );
+	// Commented
+	attrSet.createNumericAttribute<int> ( "-thread", this->_num_threads, "The number of threads" ).setDefaultValue( 4 ).setMin( 1 );
+	//attrSet.createNumericAttribute<int> ( "-thread", this->_num_threads, "The number of threads" ).setDefaultValue( mi::SystemInfo::getNumCores() ).setMin( 1 );
+        
         attrSet.createNumericAttribute<T>( "-iso", this->_isovalue, "isovalue" ).setMandatory();
         attrSet.createBooleanAttribute( "-fill", this->_fillHole, "fill hole by polygons" );
         attrSet.createBooleanAttribute( "-auto", this->_auto, "automatic estimation of -hole parameter" );
@@ -47,7 +50,8 @@ ExtractEndocastCommand<T>::init ( const mi::Argument& arg )
                 mi::VolumeDataUtility::setDebugModeOn();
 
         }
-	mi::SystemInfo::print( mi::Logger::getStream() );
+	//Commented 
+	//mi::SystemInfo::print( mi::Logger::getStream() );
 	this->getAttributeSet().print( mi::Logger::getStream() );
 
 	// initialization of the volume.
