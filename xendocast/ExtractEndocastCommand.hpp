@@ -19,6 +19,8 @@ private:
         T _isovalue;
         double _scale;
         double _hole;
+	bool _seed;
+	mi::Point3i _seed_point;
 
         mi::VolumeData<T>    _ctData;
         mi::VolumeData<char> _binaryData;

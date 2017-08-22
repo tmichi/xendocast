@@ -27,7 +27,11 @@ ExtractEndocastCommand<T>::ExtractEndocastCommand ( void ) : mi::CommandTemplate
         attrSet.createNumericAttribute<int> ( "-thread", this->_num_threads, "The number of threads" ).setDefaultValue( mi::SystemInfo::getNumCores() ).setMin( 1 );
         attrSet.createNumericAttribute<T>( "-iso", this->_isovalue, "isovalue" ).setMandatory();
         attrSet.createBooleanAttribute( "-fill", this->_fillHole, "fill hole by polygons" );
+
         attrSet.createBooleanAttribute( "-auto", this->_auto, "automatic estimation of -hole parameter" );
+	mi::Point3i& sp = this->_seed_point;
+	attrSet.createBooleanAttribute( "--seed", this->_seed, "seed" );	
+	attrSet.createTripleNumericAttribute("--seed", sp.x(), sp.y(), sp.z(), "seed point");
         attrSet.createNumericAttribute<double>( "-hole", this->_hole, "size of hole" ).setMin( 0.0001 ).setDefaultValue( 30 );
         return ;
 }
@@ -124,7 +128,23 @@ ExtractEndocastCommand<T>::watershed( mi::VolumeData<float>& distData, mi::Volum
         const mi::VolumeInfo& info = const_cast<mi::VolumeData<T>&>( this->_ctData ).getInfo();
         mi::Range range( info.getMin(), info.getMax() );
 
-        if ( this->_auto ) {
+	if ( this->_seed ) {
+		std::cerr<<"manual seed"<<std::endl;
+                mi::VolumeDataCreator<char> creator( labelData ) ;
+                creator.setValue( 1 );
+                for( mi::Range::iterator iter = range.begin() ; iter != range.end() ; ++iter ) {
+                        const mi::Point3i& p = *iter;
+                        if ( info.isCorner( p ) && labelData.get( p ) == 0 ) {
+                                const float dist = distData.get( p );
+                                if ( dist <= 0 ) continue;
+                                creator.fillSphere( p, dist * 0.9f );
+                        }
+                }
+		std::cerr<<this->_seed_point.transpose()<<" "<<distData.get(this->_seed_point)<<std::endl;
+                creator.setValue( 2 );
+                creator.fillSphere( this->_seed_point, distData.get(this->_seed_point) * 0.5f );
+	}
+        else if ( this->_auto ) {
                 std::cerr<<"automatic mode."<<std::endl;
                 mi::VolumeDataCreator<char> creator( labelData ) ;
                 creator.setValue( 1 );
